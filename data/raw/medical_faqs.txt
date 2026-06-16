@@ -1,0 +1,59 @@
+Q: What is paracetamol used for?
+A: Paracetamol relieves mild to moderate pain and reduces fever. Adult dose is 500mg to 1000mg every 4-6 hours. Maximum 4000mg per day.
+
+Q: What are side effects of paracetamol?
+A: Side effects include nausea and stomach pain. Avoid alcohol. Do not overdose as it causes liver damage.
+
+Q: What is metformin used for?
+A: Metformin treats type 2 diabetes. Controls blood sugar. Usual dose is 500mg twice daily with meals.
+
+Q: What is amlodipine used for?
+A: Amlodipine treats high blood pressure. Usual dose is 5mg once daily. May cause ankle swelling.
+
+Q: What is azithromycin used for?
+A: Azithromycin is an antibiotic for respiratory and ear infections. Usual dose is 500mg once daily for 3 days.
+
+Q: What is omeprazole used for?
+A: Omeprazole reduces stomach acid. Used for acidity and ulcers. Take 20mg once daily before meals.
+
+Q: What is cetirizine used for?
+A: Cetirizine treats allergies and runny nose. Usual dose is 10mg once daily at night.
+
+Q: What is amoxicillin used for?
+A: Amoxicillin is an antibiotic for throat, ear, and chest infections. Usual dose is 500mg three times daily.
+
+Q: What are symptoms of diabetes?
+A: Symptoms include increased thirst, frequent urination, weight loss, blurred vision, and fatigue.
+
+Q: What are symptoms of hypertension?
+A: High blood pressure often has no symptoms. Some people get headache, dizziness, and blurred vision.
+
+Q: What are symptoms of malaria?
+A: Symptoms include high fever with chills, headache, muscle pain, nausea, and sweating.
+
+Q: What is Aarogyasri scheme?
+A: Aarogyasri is a health insurance scheme by Telangana government for BPL families. Covers up to 5 lakhs per year for serious illnesses at empanelled hospitals.
+
+Q: Who is eligible for Aarogyasri?
+A: Families with white ration card in Telangana are eligible. Covers all family members for major surgeries.
+
+Q: What is PM-JAY scheme?
+A: PM-JAY provides health coverage of 5 lakhs per family per year for poor families for hospitalization.
+
+Q: Who is eligible for PM-JAY?
+A: Families listed in SECC 2011 data are eligible. Check eligibility at pmjay.gov.in or call 14555.
+
+Q: What is NHM scheme?
+A: National Health Mission provides free healthcare services at government hospitals including medicines and diagnostics.
+
+Q: What is ibuprofen used for?
+A: Ibuprofen relieves pain, fever, and inflammation. Usual dose is 400mg three times daily with food.
+
+Q: What is atenolol used for?
+A: Atenolol treats high blood pressure and heart conditions. Usual dose is 50mg once daily.
+
+Q: What is pantoprazole used for?
+A: Pantoprazole reduces stomach acid. Used for acidity and ulcers. Take 40mg once daily before breakfast.
+
+Q: What are symptoms of typhoid?
+A: Symptoms include sustained high fever, weakness, stomach pain, headache, and loss of appetite.
