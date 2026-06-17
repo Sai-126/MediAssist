@@ -1,28 +1,24 @@
-from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
 
-loaders = [
-    PyPDFLoader("data/raw/nhm_guidelines.pdf"),
-    PyPDFLoader("data/raw/pmjay.pdf"),
-    PyPDFLoader("data/raw/Communicable Diseases.pdf"),
-    PyPDFLoader("data/raw/Guidebook for Medical Officer.pdf"),
-    PyPDFLoader("data/raw/Guidelines_CommonIllness.pdf"),
-    PyPDFLoader("data/raw/WHO medical list.pdf"),
-    TextLoader("data/raw/medical_faqs.txt", encoding="utf-8"),
-]
+RAW_DIR = "data/raw/"
+VECTOR_DIR = "vector_store/"
 
-docs = []
-for loader in loaders:
-    try:
-        docs.extend(loader.load())
-        print(f"Loaded successfully")
-    except Exception as e:
-        print(f"Error: {e}")
+print("Loading documents...")
+pdf_loader = DirectoryLoader(RAW_DIR, glob="**/*.pdf", loader_cls=PyPDFLoader)
+txt_loader = DirectoryLoader(RAW_DIR, glob="**/*.txt", loader_cls=TextLoader,
+                               loader_kwargs={"encoding": "utf-8"})
 
+docs = pdf_loader.load() + txt_loader.load()
 print(f"Total documents loaded: {len(docs)}")
+
+for doc in docs:
+    doc.metadata["source"] = os.path.basename(
+        doc.metadata.get("source", "unknown")
+    )
 
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=500,
@@ -35,6 +31,12 @@ print(f"Total chunks created: {len(chunks)}")
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
-vectorstore = FAISS.from_documents(chunks, embedding_model)
-vectorstore.save_local("vector_store/")
-print("Vector store built and saved!")
+
+print("Building vector store...")
+vectorstore = Chroma.from_documents(
+    chunks,
+    embedding_model,
+    persist_directory=VECTOR_DIR
+)
+print(f"Vector store saved to {VECTOR_DIR}")
+print("Done!")
