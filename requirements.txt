@@ -10,3 +10,4 @@ pytesseract
 Pillow
 sentence-transformers
 python-dotenv
+pypdf
