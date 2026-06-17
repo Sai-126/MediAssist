@@ -1,5 +1,5 @@
 from agents.base_agent import BaseAgent
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 import os
 from dotenv import load_dotenv
@@ -8,23 +8,34 @@ load_dotenv()
 class SymptomAgent(BaseAgent):
     def __init__(self):
         super().__init__()
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+        self.llm = ChatGroq(
+            model="llama-3.1-8b-instant",
+            api_key=os.getenv("GROQ_API_KEY"),
+            temperature=0.3
         )
 
-    def check_symptoms(self, symptoms: str, language: str = "english") -> str:
-        context = self.retrieve(symptoms)
-        context_str = "\n".join(context)
-        lang_instruction = "Respond in Telugu." if language == "telugu" else "Respond in English."
-        prompt = f"""You are a health assistant. Based only on the context below,
-describe what conditions may match the symptoms. Do NOT diagnose.
-Always say: Please visit a doctor for proper diagnosis.
-{lang_instruction}
+    def check(self, symptoms: str, language: str = "english") -> str:
+        docs = self.retrieve(symptoms)
+        context = self.format_context(docs)
+        lang = "Telugu" if language == "telugu" else "English"
+
+        prompt = f"""You are a health information assistant for rural patients in India.
+Use ONLY the context below to answer.
+Cite the source document name for every fact.
+Respond in {lang}.
+Do NOT diagnose. Always end with "Please consult a qualified doctor."
+If you cannot find relevant information, say so honestly.
 
 Context:
-{context_str}
+{context}
 
-Symptoms: {symptoms}"""
+Patient symptoms:
+{symptoms}
+
+List:
+- Possible conditions matching these symptoms
+- General advice
+- Warning signs that need immediate hospital visit"""
+
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return response.content

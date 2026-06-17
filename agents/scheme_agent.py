@@ -1,5 +1,5 @@
 from agents.base_agent import BaseAgent
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 import os
 from dotenv import load_dotenv
@@ -8,23 +8,38 @@ load_dotenv()
 class SchemeAgent(BaseAgent):
     def __init__(self):
         super().__init__()
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+        self.llm = ChatGroq(
+            model="llama-3.1-8b-instant",
+            api_key=os.getenv("GROQ_API_KEY"),
+            temperature=0.3
         )
 
-    def check_eligibility(self, profile: str, language: str = "english") -> str:
-        context = self.retrieve(profile)
-        context_str = "\n".join(context)
-        lang_instruction = "Respond in Telugu." if language == "telugu" else "Respond in English."
-        prompt = f"""You are a government scheme advisor for rural patients in AP and Telangana.
-Based only on the context below, tell if the patient qualifies for Aarogyasri, PM-JAY, or NHM schemes.
-Cite which document each eligibility rule comes from.
-{lang_instruction}
+    def check_eligibility(self, profile: dict, language: str = "english") -> str:
+        query = f"eligibility criteria income {profile.get('income')} family {profile.get('family_size')} district {profile.get('district')}"
+        docs = self.retrieve(query)
+        context = self.format_context(docs)
+        lang = "Telugu" if language == "telugu" else "English"
+
+        prompt = f"""You are a government health scheme assistant for rural patients in India.
+Use ONLY the context below to answer.
+Cite the scheme document name for every fact.
+Respond in {lang}.
+If you cannot find eligibility information, say so honestly.
 
 Context:
-{context_str}
+{context}
 
-Patient profile: {profile}"""
+Patient profile:
+- District: {profile.get('district')}
+- Annual income: Rs.{profile.get('income')}
+- Age: {profile.get('age')}
+- Family size: {profile.get('family_size')}
+- Category: {profile.get('category')}
+
+List:
+- Which schemes this patient qualifies for (Aarogyasri, PM-JAY, NHM)
+- Benefits available
+- Steps to apply"""
+
         response = self.llm.invoke([HumanMessage(content=prompt)])
         return response.content
