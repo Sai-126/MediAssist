@@ -1,6 +1,6 @@
 from agents.base_agent import BaseAgent
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.schema import HumanMessage
+from langchain_core.messages import HumanMessage
 import os
 from dotenv import load_dotenv
 load_dotenv()
