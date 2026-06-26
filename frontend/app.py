@@ -7,8 +7,23 @@ from data.facilities import get_facilities
 st.set_page_config(
     page_title="MediAssist",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
+
+with st.sidebar:
+    st.markdown("### About MediAssist")
+    st.markdown("""
+    An AI-powered health assistant helping rural patients in
+    Andhra Pradesh and Telangana understand prescriptions,
+    symptoms, and government health schemes.
+    """)
+    st.markdown("---")
+    st.markdown("**Team 1**")
+    st.markdown("Sai Laxmi Pasagadugula")
+    st.markdown("Hemalatha Kada")
+    st.markdown("Vennela Gubbala")
+    st.markdown("---")
+    st.caption("SolvEmpire AIML Batch")
 
 @st.cache_resource
 def load_orchestrator():
