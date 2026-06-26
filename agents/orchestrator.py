@@ -13,20 +13,24 @@ class Orchestrator:
     def route(self, query_type: str, query=None, image_file=None,
               profile: dict = None, language: str = "english") -> str:
 
-        if query_type == "prescription":
-            if not query and not image_file:
-                return "Please provide prescription text or upload an image."
-            return self.prescription_agent.explain(text=query, image_file=image_file, language=language)
+        try:
+            if query_type == "prescription":
+                if not query and not image_file:
+                    return "Please provide prescription text or upload an image."
+                return self.prescription_agent.explain(text=query, image_file=image_file, language=language)
 
-        elif query_type == "symptoms":
-            if not query:
-                return "Please describe your symptoms."
-            return self.symptom_agent.check(query, language)
+            elif query_type == "symptoms":
+                if not query:
+                    return "Please describe your symptoms."
+                return self.symptom_agent.check(query, language)
 
-        elif query_type == "scheme":
-            if not profile:
-                return "Please provide patient details."
-            return self.scheme_agent.check_eligibility(profile, language)
+            elif query_type == "scheme":
+                if not profile:
+                    return "Please provide patient details."
+                return self.scheme_agent.check_eligibility(profile, language)
 
-        else:
-            return "Invalid query type. Choose: prescription, symptoms, or scheme."
+            else:
+                return "Invalid query type. Choose: prescription, symptoms, or scheme."
+
+        except Exception as e:
+            return f"Something went wrong while processing your request. Please try again in a moment. (Technical detail: {str(e)[:150]})"
