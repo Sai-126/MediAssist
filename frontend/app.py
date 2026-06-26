@@ -2,6 +2,7 @@ import streamlit as st
 import sys
 sys.path.append(".")
 from agents.orchestrator import Orchestrator
+from data.facilities import get_facilities
 
 st.set_page_config(
     page_title="MediAssist",
@@ -34,17 +35,32 @@ tab1, tab2, tab3 = st.tabs([
 
 with tab1:
     st.subheader("Understand your prescription")
+
+    uploaded_image = st.file_uploader(
+        "Upload prescription image (clear photo works best)",
+        type=["jpg", "jpeg", "png"]
+    )
+
+    if uploaded_image:
+        st.image(uploaded_image, caption="Uploaded prescription", width=300)
+
     text_input = st.text_area(
-        "Type medicine names and instructions",
+        "Or type medicine names and instructions",
         height=120,
         placeholder="e.g. Tab Paracetamol 500mg twice daily after food"
     )
+
     if st.button("Explain", type="primary", key="btn1"):
-        if not text_input.strip():
-            st.warning("Please enter prescription text.")
+        if not text_input.strip() and not uploaded_image:
+            st.warning("Please enter prescription text or upload an image.")
         else:
             with st.spinner("Reading prescription..."):
-                result = orch.route("prescription", query=text_input, language=lang_code)
+                result = orch.route(
+                    "prescription",
+                    query=text_input if text_input.strip() else None,
+                    image_file=uploaded_image,
+                    language=lang_code
+                )
             st.markdown(result)
 
 with tab2:
@@ -92,3 +108,8 @@ with tab3:
                 language=lang_code
             )
         st.markdown(result)
+
+        facilities = get_facilities(district)
+        st.markdown("**Nearby government facilities:**")
+        for f in facilities:
+            st.markdown(f"- {f}")
