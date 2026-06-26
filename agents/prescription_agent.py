@@ -1,4 +1,5 @@
 from agents.base_agent import BaseAgent
+from agents.ocr_tool import extract_text_from_image
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 import os
@@ -14,7 +15,15 @@ class PrescriptionAgent(BaseAgent):
             temperature=0.3
         )
 
-    def explain(self, text: str, language: str = "english") -> str:
+    def explain(self, text: str = None, image_file=None, language: str = "english") -> str:
+        if image_file is not None:
+            text = extract_text_from_image(image_file)
+            if not text:
+                return "Could not read any text from the uploaded image. Please try a clearer photo or type the prescription manually."
+
+        if not text:
+            return "Please provide prescription text or an image."
+
         docs = self.retrieve(text)
         context = self.format_context(docs)
         lang = "Telugu" if language == "telugu" else "English"
