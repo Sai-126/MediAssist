@@ -1,19 +1,38 @@
-from langchain_community.document_loaders import PyPDFLoader, TextLoader, DirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
+import glob
 
 RAW_DIR = "data/raw/"
 VECTOR_DIR = "vector_store/"
 
 print("Loading documents...")
-pdf_loader = DirectoryLoader(RAW_DIR, glob="**/*.pdf", loader_cls=PyPDFLoader)
-txt_loader = DirectoryLoader(RAW_DIR, glob="**/*.txt", loader_cls=TextLoader,
-                               loader_kwargs={"encoding": "utf-8"})
+docs = []
 
-docs = pdf_loader.load() + txt_loader.load()
-print(f"Total documents loaded: {len(docs)}")
+pdf_files = glob.glob(os.path.join(RAW_DIR, "**/*.pdf"), recursive=True)
+txt_files = glob.glob(os.path.join(RAW_DIR, "**/*.txt"), recursive=True)
+
+for pdf_path in pdf_files:
+    try:
+        loader = PyPDFLoader(pdf_path)
+        loaded = loader.load()
+        docs.extend(loaded)
+        print(f"Loaded: {os.path.basename(pdf_path)} ({len(loaded)} pages)")
+    except Exception as e:
+        print(f"SKIPPED (corrupted/unreadable): {os.path.basename(pdf_path)} - {str(e)[:100]}")
+
+for txt_path in txt_files:
+    try:
+        loader = TextLoader(txt_path, encoding="utf-8")
+        loaded = loader.load()
+        docs.extend(loaded)
+        print(f"Loaded: {os.path.basename(txt_path)}")
+    except Exception as e:
+        print(f"SKIPPED: {os.path.basename(txt_path)} - {str(e)[:100]}")
+
+print(f"\nTotal documents loaded: {len(docs)}")
 
 for doc in docs:
     doc.metadata["source"] = os.path.basename(
