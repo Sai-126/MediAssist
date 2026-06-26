@@ -2,12 +2,29 @@ import streamlit as st
 import sys
 sys.path.append(".")
 from agents.orchestrator import Orchestrator
+from data.facilities import get_facilities
+from agents.dosage_helper import generate_dosage_schedule
 
 st.set_page_config(
     page_title="MediAssist",
     layout="centered",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
+
+with st.sidebar:
+    st.markdown("### About MediAssist")
+    st.markdown("""
+    An AI-powered health assistant helping rural patients in
+    Andhra Pradesh and Telangana understand prescriptions,
+    symptoms, and government health schemes.
+    """)
+    st.markdown("---")
+    st.markdown("**Team 1**")
+    st.markdown("Sai Laxmi Pasagadugula")
+    st.markdown("Hemalatha Kada")
+    st.markdown("Vennela Gubbala")
+    st.markdown("---")
+    st.caption("SolvEmpire AIML Batch")
 
 @st.cache_resource
 def load_orchestrator():
@@ -34,18 +51,45 @@ tab1, tab2, tab3 = st.tabs([
 
 with tab1:
     st.subheader("Understand your prescription")
+
+    uploaded_image = st.file_uploader(
+        "Upload prescription image (clear photo works best)",
+        type=["jpg", "jpeg", "png"]
+    )
+
+    if uploaded_image:
+        st.image(uploaded_image, caption="Uploaded prescription", width=300)
+
     text_input = st.text_area(
-        "Type medicine names and instructions",
+        "Or type medicine names and instructions",
         height=120,
         placeholder="e.g. Tab Paracetamol 500mg twice daily after food"
     )
+
     if st.button("Explain", type="primary", key="btn1"):
-        if not text_input.strip():
-            st.warning("Please enter prescription text.")
+        if not text_input.strip() and not uploaded_image:
+            st.warning("Please enter prescription text or upload an image.")
         else:
             with st.spinner("Reading prescription..."):
-                result = orch.route("prescription", query=text_input, language=lang_code)
+                result = orch.route(
+                    "prescription",
+                    query=text_input if text_input.strip() else None,
+                    image_file=uploaded_image,
+                    language=lang_code
+                )
             st.markdown(result)
+
+            if text_input.strip():
+                schedule = generate_dosage_schedule(text_input)
+                st.info(schedule)
+
+            col_a, col_b = st.columns(2)
+            with col_a:
+                if st.button("Helpful", key="up1"):
+                    st.success("Thanks for your feedback!")
+            with col_b:
+                if st.button("Not helpful", key="down1"):
+                    st.info("Thanks, we will improve this.")
 
 with tab2:
     st.subheader("Describe your symptoms")
@@ -62,6 +106,14 @@ with tab2:
             with st.spinner("Searching medical information..."):
                 result = orch.route("symptoms", query=symptoms, language=lang_code)
             st.markdown(result)
+
+            col_a, col_b = st.columns(2)
+            with col_a:
+                if st.button("Helpful", key="up2"):
+                    st.success("Thanks for your feedback!")
+            with col_b:
+                if st.button("Not helpful", key="down2"):
+                    st.info("Thanks, we will improve this.")
 
 with tab3:
     st.subheader("Check health scheme eligibility")
@@ -92,3 +144,16 @@ with tab3:
                 language=lang_code
             )
         st.markdown(result)
+
+        facilities = get_facilities(district)
+        st.markdown("**Nearby government facilities:**")
+        for f in facilities:
+            st.markdown(f"- {f}")
+
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("Helpful", key="up3"):
+                st.success("Thanks for your feedback!")
+        with col_b:
+            if st.button("Not helpful", key="down3"):
+                st.info("Thanks, we will improve this.")
