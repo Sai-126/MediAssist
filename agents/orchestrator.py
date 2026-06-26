@@ -10,13 +10,13 @@ class Orchestrator:
         self.scheme_agent = SchemeAgent()
         print("All agents ready.")
 
-    def route(self, query_type: str, query=None,
+    def route(self, query_type: str, query=None, image_file=None,
               profile: dict = None, language: str = "english") -> str:
 
         if query_type == "prescription":
-            if not query:
-                return "Please provide prescription text."
-            return self.prescription_agent.explain(query, language)
+            if not query and not image_file:
+                return "Please provide prescription text or upload an image."
+            return self.prescription_agent.explain(text=query, image_file=image_file, language=language)
 
         elif query_type == "symptoms":
             if not query:
