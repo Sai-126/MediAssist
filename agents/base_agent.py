@@ -1,18 +1,25 @@
+from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 class BaseAgent:
+    _embedding_model = None
+    _vectorstore = None
+
     def __init__(self):
-        self.embedding_model = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
-        self.vectorstore = Chroma(
-            persist_directory="vector_store/",
-            embedding_function=self.embedding_model
-        )
+        if BaseAgent._embedding_model is None:
+            BaseAgent._embedding_model = HuggingFaceEmbeddings(
+                model_name="sentence-transformers/all-MiniLM-L6-v2",
+                model_kwargs={"device": "cpu"}
+            )
+        if BaseAgent._vectorstore is None:
+            BaseAgent._vectorstore = Chroma(
+                persist_directory="vector_store/",
+                embedding_function=BaseAgent._embedding_model
+            )
+        self.vectorstore = BaseAgent._vectorstore
 
     def retrieve(self, query: str, k: int = 4) -> list:
         results = self.vectorstore.similarity_search(query, k=k)
