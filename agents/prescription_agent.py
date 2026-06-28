@@ -17,9 +17,10 @@ class PrescriptionAgent(BaseAgent):
 
     def explain(self, text: str = None, image_file=None, language: str = "english") -> str:
         if image_file is not None:
-            text = extract_text_from_image(image_file)
-            if not text:
-                return "Could not read any text from the uploaded image. Please try a clearer photo or type the prescription manually."
+            extracted = extract_text_from_image(image_file)
+            if not extracted:
+                return "Image upload could not be processed right now. Please type the medicine names instead for the most reliable results."
+            text = extracted
 
         if not text:
             return "Please provide prescription text or an image."
